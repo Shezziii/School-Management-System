@@ -179,7 +179,7 @@ def Add_Teacher( ):
       religion=input("Enter Religion of Teacher : ")
       address=input("Enter address of Teacher : ")     
       email=input("Enter Email of Teacher : ")
-      joining_date=(datetime.datetime.now()).split( )[0]  
+      joining_date=str(datetime.datetime.now()).split( )[0]  
       sql_statement=f'''insert into Teacher_details values ('{name}','{subject}','{id}', '{phone_no}','{gender}', '{religion}' ,'{address}' , '{email}' ,'{ joining_date}'); '''    
       Data = (name,subject,id , phone_no ,gender , religion ,address , email , joining_date)
       MyCur.execute(sql_statement)     
