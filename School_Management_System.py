@@ -19,7 +19,7 @@ import random
 clear = lambda: os.system('cls' if os.name in ('nt', 'dos') else 'clear')
 
 #Create a connection with Database.
-MyDB=sqlite3.connect("login.db" , check_same_thread=False)
+MyDB=sqlite3.connect("School_Management_System.db" , check_same_thread=False)
           
 # Create a Cursor for Execute all query into database.
 MyCur=MyDB.cursor() 
@@ -32,6 +32,7 @@ MyCur.execute(''' Create Table If Not Exists fee_table( roll_no int primary key 
 
 # Create a Table for Registration.
 MyCur.execute(''' Create Table If Not Exists stu_registration( name varchar(30) , father_name varchar(30) , class varchar(10) , reg_no varchar(15) primary key , phone_no varchar(13) , address varchar(40) , registration_date date);''')
+
 # Function for Student Registration.
      
 #Create a Table for storing Student Data.
@@ -48,7 +49,7 @@ def sys_setting( ):
            \n\t\t******************************************************************************************* 
                   1 . Reset System                                     2 . Change Font / Color  
                   3 . About software                                   4 .Change Password
-                  5 . Help Center
+                  5 . Help Center                                      6. for back.
                 ******************************************************************************************* ''')                                  
       task = input("\n      Enter task No : ")
       if task == '1':
@@ -60,16 +61,26 @@ def sys_setting( ):
       elif task=='4':
             change_pass( )
       elif task == '5':
-            help( ) 
+            help( )
+      elif task == '6':
+            back( ) 
       else :
             print("\n    Please Enter Valid No. ")
 
 # Function for showing Details about software
 def about_software( ):
-      print(''' \n\tSoftware Name : iCoder school Management System.\n\tSoftware Type : Console Application. \n\tDevelope By : Team iCoder. \n\tVersion : 0.0.01 Global.\n\n\n\n\t\t\t\t******* Thank You From shezziii  to use Our software. ********* ''' )                          
+      print(''' \n\tSoftware Name : iCoder school Management System.\n\tSoftware Type : Console Application. \n\tDevelope By : Team iCoder. \n\tVersion : 0.0.01 Global.\n\n\n\n\t\t\t\t******* Thank You From shezziii  to use Our software. ********* ''' )
+      
+                               
+# Function for Back.
+def back():
+      clear()
+      Main()
+      
 # Function for Help.
 def help( ):
-      print('''\n Hello ,\n\n\t You are using a School Management Syatem Develope By iCoder Team.\n\t if you are not Understand working of System Please contact with  iCoder Team.\n\t I hope you are having good experience with it.\n\t Contect no : 0000000XYZ  \n\t For feedback Visit - www.iCoder.in \n\n\n\t\t\t\t********* Thank You *************''') 
+      print('''\n Hello ,\n\n\t You are using a School Management Syatem Develope By iCoder Team.\n\t if you are not Understand working of System Please contact with  iCoder Team.\n\t I hope you are having good experience with it.\n\t Contect no : 0000000XYZ  \n\t For feedback Visit - www.iCoder.in \n\n\n\t\t\t\t********* Thank You *************''')
+      
                             
 #  Function for change color.
 def change_font_color( ):
@@ -83,7 +94,7 @@ def user_pass( ):
       MyCur.execute(" select pass from password ;")
       key=MyCur.fetchone( )
       if key == None :
-            user=input("\n Enter User Name For Sign-Up : ")
+            user=input("\n Enter Username For Sign-Up : ")
             pass_=input("\n Create a '8' digits Password ( please , Create a strong Password ) : ")
             pass_key=input(" \n Enter your Faviorate person Name : ")
             MyCur.execute(f" Insert into password values ( '{user}' , '{pass_}' , '{pass_key}');")     
@@ -98,7 +109,8 @@ def user_pass( ):
            if( result==None):
                  print("\n Invalid Username and Password . ")
                  f_pass=input(" \n Forget Password ( Y / N ) : ")
-                 if f_pass=='Y':
+                 if f_pass=='Y' or f_pass=='y':
+                       clear()
                        user=input("\n Enter User Name : ")
                        pass_key=input(" \n Enter your Faviorate person Name : ")
                        MyCur.execute(f" Select pass from password where user='{user}' and pass_key='{pass_key}';")
@@ -106,8 +118,17 @@ def user_pass( ):
                        if pass_==None:
                              print("/n Invalid user and password key . ")
                              user_pass( )
+                       else :
+                             pass_=input("\n Create a New '8' digits Password ( please , Create a strong Password ) : ")
+                             MyCur.execute(f" Insert into password values ( '{user}' , '{pass_}' , '{pass_key}');")     
+                             MyDB.commit()
+                             print('\n\n\n\n\n\t\t\t\t  Loging successful .........')
+                             input("\n\n Press enter key - ")
+                             clear()
+                             
                  else : 
                        clear()
+                       user_pass()
            else :
                  print('\n\n\n\n\n\t\t\t\t  Loging successful .........')
                  input("\n\n Press enter key - ")
@@ -140,7 +161,7 @@ def reset( ):
                   MyCur.execute('Drop Table password;')
                   MyDB.commit()   
                   clear()
-                  print('''\n\n\n\n\n\n                                              System Successfully  Reset ''' )   
+                  print('''\n\n\n\n\n\n  System Successfully  Reset ''' )   
             else :
                   return
       else:
@@ -159,9 +180,9 @@ def Add_Teacher( ):
       address=input("Enter address of Teacher : ")     
       email=input("Enter Email of Teacher : ")
       joining_date=(datetime.datetime.now()).split( )[0]  
-      sql_statement='''insert into Teacher_details values (%s , %s , %s , %s , %s , %s ,%s ,%s , %s ); '''    
+      sql_statement=f'''insert into Teacher_details values ('{name}','{subject}','{id}', '{phone_no}','{gender}', '{religion}' ,'{address}' , '{email}' ,'{ joining_date}'); '''    
       Data = (name,subject,id , phone_no ,gender , religion ,address , email , joining_date)
-      MyCur.execute(sql_statement, Data)     
+      MyCur.execute(sql_statement)     
       MyDB.commit() 
       print("\n************************* Entered Teacher Details ************************** ")
       Teacher_Print(Data)
@@ -169,7 +190,7 @@ def Add_Teacher( ):
 # Function for Searching Details of Teacher.
 def search_Teacher( ):
       key = int(input("\n Enter Id No of Teacher for Searching : "))
-      sql_statement = f''' select * from Teacher_details where id = {key} ; '''
+      sql_statement = f''' select * from Teacher_details where id = '{key}' ; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -181,7 +202,7 @@ def search_Teacher( ):
 # Function for Update Teacher details.
 def update_Teacher( ):
       key=int(input("\n Enter ld No of Teacher for Updating : "))
-      sql_statement = f''' select * from Teacher_details where id = {key} ; '''
+      sql_statement = f''' select * from Teacher_details where id = '{key}' ; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -189,7 +210,7 @@ def update_Teacher( ):
             return
       print("\n********************** Id No {key} Teacher Old Details *********************** ")
       Teacher_Print(Data)
-      sql_statement = f''' Delete from Teacher_details where id = {key} ; '''
+      sql_statement = f''' Delete from Teacher_details where id = '{key}' ; '''
       MyCur.execute(sql_statement)
       MyDB.commit()
       print("\n************************* Enter New Record ****************************")
@@ -198,7 +219,7 @@ def update_Teacher( ):
 # Function for Remove Teacher.
 def remove_Teacher( ):
       key = int(input("\n Enter ld No of Teacher for Deletion : "))
-      sql_statement = f''' select * from Teacher_details where id = {key} ; '''
+      sql_statement = f''' select * from Teacher_details where id ='{key}' ; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -206,7 +227,7 @@ def remove_Teacher( ):
             return
       print("\n*********************** Deleted Teacher Details *************************** ")
       Teacher_Print(Data)
-      sql_statement = f''' Delete from Teacher_details where id = {key} ; '''
+      sql_statement = f''' Delete from Teacher_details where id ='{key}'; '''
       MyCur.execute(sql_statement)
       MyDB.commit()
 
@@ -233,6 +254,7 @@ def Teacher_Print( details):
 
 # **************************Function for students.*************************
 
+#function for registration of student.
 def registration(  ):
       print("\n***************** Welcom to iCoder International school *********************")
       print("\n Filling the correct Details for registration : ")
@@ -243,10 +265,10 @@ def registration(  ):
       phone_no=input("Enter Phone No  of student : ")           
       address=input("Enter address of student : ")     
       registration_date=str(datetime.datetime.now()).split( )[0]  
-      sql_statement='''insert into stu_registration values (%s , %s , %s , %s , %s , %s ,%s ); '''    
+      sql_statement=f'''insert into stu_registration values('{name}','{fname}','{class_name}','{reg_no}', '{phone_no}' ,'{address}','{registration_date}' ); '''    
       print(f"\n Student Successfully registered.\n Please must remember registration No : {reg_no}.\n (Registration No is Used When you come for addmission.)")
       Data = (name,fname,class_name,reg_no , phone_no ,address,registration_date)
-      MyCur.execute(sql_statement, Data)     
+      MyCur.execute(sql_statement)     
       MyDB.commit() 
 
 # Function for Add Student.
@@ -268,10 +290,9 @@ def Add_Student( ):
       address=input("Enter address of student : ")     
       email=input("Enter Email of student : ")
       addmission_date=str(datetime.datetime.now()).split( )[0]  
-      sql_statement='''insert into stu_details values (%s , %s , %s , %s , %s , %s ,%s ,%s , %s , %s); '''    
-      Data = (name,fname,class_name,roll_no , phone_no ,gender , religion ,address , email , addmission_date)
-      MyCur.execute(sql_statement, Data)     
-      MyCur.execute(f"insert into fee_table values ({ roll_no } , 0 , '{class_name}' );")
+      sql_statement=f'''insert into stu_details values ( {name},{fname},{class_name},{roll_no} , {phone_no} ,{gender}, {religion},{address} ,{email} , {addmission_date});'''
+      MyCur.execute(sql_statement)     
+      MyCur.execute(f"insert into fee_table values ('{ roll_no }' , 0 , '{class_name}' );")
       MyDB.commit() 
       print("\n************************* Entered Student Details ************************** ")
       Print(Data)
@@ -283,7 +304,7 @@ def Print( details):
 # Function for Searching for student.
 def search_student( ):
       key = int(input("\n Enter Roll No of Student for Searching : "))
-      sql_statement = f''' select * from stu_details where roll_no = {key} ; '''
+      sql_statement = f''' select * from stu_details where roll_no = '{key}' ; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -295,7 +316,7 @@ def search_student( ):
 # Function for Updating of Student Details.
 def update_student( ):
       key=int(input("\n Enter Roll No of Student for Updating : "))
-      sql_statement = f''' select * from stu_details where roll_no = {key} ; '''
+      sql_statement = f''' select * from stu_details where roll_no = '{key}'; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -303,7 +324,7 @@ def update_student( ):
             return
       print("\n********************** Roll No {key} Student Old Details *********************** ")
       Print(Data)
-      sql_statement = f''' Delete from stu_details where roll_no = {key} ; '''
+      sql_statement = f''' Delete from stu_details where roll_no = '{key}' ; '''
       MyCur.execute(sql_statement)
       MyDB.commit()
       print("\n************************* Enter New Record ****************************")
@@ -312,7 +333,7 @@ def update_student( ):
 # Function for Delete Student.                                                                                      
 def remove_student( ):
       key = int(input("\n Enter Roll No of Student for Deletion : "))
-      sql_statement = f''' select * from stu_details where roll_no = {key} ; '''
+      sql_statement = f''' select * from stu_details where roll_no = '{key}' ; '''
       MyCur.execute(sql_statement)
       Data = MyCur.fetchone( )
       if Data == None:
@@ -320,7 +341,7 @@ def remove_student( ):
             return
       print("\n*********************** Deleted Student Details *************************** ")
       Print(Data)
-      sql_statement = f''' Delete from stu_details where roll_no = {key} ; '''
+      sql_statement = f''' Delete from stu_details where roll_no = '{key}' ; '''
       MyCur.execute(sql_statement)
       MyDB.commit()
 
@@ -367,8 +388,7 @@ def student_fee( ):
             return 
       money=int(input("Enter amount to submit : "))
       if (T_fee+money)>fee_struct[class_n]:
-           print("\n please Submit amount ( Greater than equal to remain fee ) : ")      
-      money=int(input())
+           money=int(input("\n please Submit amount ( Greater than equal to remain fee ) : "))
       value=T_fee+money     
       MyCur.execute(f"Update fee_table set submitted_fee = {value} where roll_no={roll_No};")
       MyDB.commit()
@@ -376,10 +396,15 @@ def student_fee( ):
  
 # Main Function of Program.                              
 def Main( ):
-      print('''                    ********************* iCoder School Management System **********************                     
+      print('''     ********************* iCoder School Management System **********************************                    
                      1 . Student Registration                                      2 . New addmission
-                     3 . Remove Student                                            4 . Update Student Details                           5 . Search Student                                            6 . View All Student                                 7 . Add Teacher                                               8 . Remove Teacher                                   9 . Update Teacher Details                                    10. Search Teacher                                   11. View All Teacher                                          12. Fee Details                                      13. System Setting                                            14. Exit
-                  \n                    **********************************************************************************''')
+                     3 . Remove Student                                            4 . Update Student Details  
+                     5 . Search Student                                            6 . View All Student 
+                     7 . Add Teacher                                               8 . Remove Teacher   
+                     9 . Update Teacher Details                                    10. Search Teacher   
+                     11. View All Teacher                                          12. Fee Details   
+                     13. System Setting                                            14. Exit
+                  \n****************************************************************************************''')
                   
       task = input("\n      Enter task No : ")
       if task=='1':
